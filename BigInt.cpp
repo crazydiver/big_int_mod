@@ -1,10 +1,4 @@
-//
-// Created by Ivan Gorbachev on 24.10.2022.
-//
-
 #include "BigInt.h"
-
-
 
 BigInt::BigInt() {
     this->_is_negative = false;
@@ -54,6 +48,7 @@ std::ostream& operator <<(std::ostream& os, const BigInt& bi) {
 
     return os;
 }
+
 bool operator <(const BigInt& left, const BigInt& right) {
     if (left == right) return false;
     if (left._is_negative) {
@@ -75,7 +70,8 @@ bool operator <(const BigInt& left, const BigInt& right) {
     }
 }
 
-const BigInt operator +(BigInt left, const BigInt& right) {
+
+BigInt operator +(BigInt left, const BigInt& right) {
     if (left._is_negative) {
         if (right._is_negative) return -(-left + (-right));
         else return right - (-left);
@@ -99,9 +95,7 @@ BigInt::operator std::string() const {
 }
 
 bool operator ==(const BigInt& left, const BigInt& right) {
-    // числа разных знаков точно не равны
     if (left._is_negative != right._is_negative) return false;
-    // поскольку у нас два представления нуля, нужно это особо обработать
     if (left._digits.empty()) {
         if (right._digits.empty() || (right._digits.size() == 1 && right._digits[0] == 0)) return true;
         else return false;
@@ -111,14 +105,13 @@ bool operator ==(const BigInt& left, const BigInt& right) {
         if (left._digits.size() == 1 && left._digits[0] == 0) return true;
         else return false;
     }
-    // так как у нас нет ведущих нулей, то в числах должно быть одинаковое количество цифр (разрядов)
     if (left._digits.size() != right._digits.size()) return false;
     for (size_t i = 0; i < left._digits.size(); ++i) if (left._digits[i] != right._digits[i]) return false;
 
     return true;
 }
 
-const BigInt operator -(BigInt left, const BigInt& right) {
+BigInt operator -(BigInt left, const BigInt& right) {
     if (right._is_negative) return left + (-right);
     else if (left._is_negative) return -(-left + right);
     else if (left < right) return -(right - left);
@@ -133,8 +126,15 @@ const BigInt operator -(BigInt left, const BigInt& right) {
     return left;
 }
 
-const BigInt BigInt::operator -() const {
+BigInt BigInt::operator -() const {
     BigInt copy(*this);
     copy._is_negative = !copy._is_negative;
     return copy;
+}
+
+std::string BigInt::toStr() {
+    std::string res;
+    for (long long i = static_cast<long long>(this->_digits.size()) - 2; i >= 0; --i)
+        res = res + std::to_string(this->_digits[i]);
+    return res;
 }
